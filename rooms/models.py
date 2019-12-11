@@ -54,8 +54,10 @@ class Photo(core_models.TimeStampedModel):
     """ Photo Model Definition """
 
     caption = models.CharField(max_length=80)
-    file = models.ImageField()
-    room = models.ForeignKey("Room", on_delete=models.CASCADE)  # string also works
+    file = models.ImageField(upload_to="room_photos")
+    room = models.ForeignKey(
+        "Room", related_name="photos", on_delete=models.CASCADE
+    )  # string also works
 
     def __str__(self):
         return self.caption
@@ -87,6 +89,10 @@ class Room(core_models.TimeStampedModel):
     amenities = models.ManyToManyField("Amenity", related_name="rooms", blank=True)
     facilities = models.ManyToManyField("Facility", related_name="rooms", blank=True)
     house_rules = models.ManyToManyField("HouseRule", related_name="rooms", blank=True)
+
+    def save(self, *args, **kwargs):
+        self.city = str.capitalize(self.city)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

@@ -24,7 +24,9 @@ class User(AbstractUser):
     CURRENCY_KRW = "krw"
     CURRENCY_CHOICES = ((CURRENCY_USD, "USD"), (CURRENCY_KRW, "KRW"))
 
-    avatar = models.ImageField(blank=True)  # null : in database, blank : in admin form
+    avatar = models.ImageField(
+        upload_to="avatars", blank=True
+    )  # null : in database, blank : in admin form
     gender = models.CharField(choices=GENDER_CHOICES, max_length=10, blank=True)
     bio = models.TextField(blank=True)  # set default or null
     birthdate = models.DateField(blank=True, null=True)
