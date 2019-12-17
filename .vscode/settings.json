@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "C:\\Users\\ASUS\\.virtualenvs\\airbnb-clone-vNrQvFVI\\Scripts\\python.exe",
+    "python.pythonPath": "/home/uhh0701/.local/share/virtualenvs/airbnb-clone-jcEyhvQ7/bin/python",
     "python.linting.pylintEnabled": false,
     "python.linting.flake8Enabled": true,
     "python.linting.enabled": true,
@@ -7,5 +7,6 @@
     "python.linting.flake8Args": [
         "--max-line-length=88"
     ],
-    "editor.fontWeight": "100"
+    "editor.fontWeight": "100",
+    "editor.formatOnSave": true
 }
