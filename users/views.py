@@ -3,19 +3,20 @@ import requests
 from django.views.generic import FormView, DetailView, UpdateView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect, reverse
+from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import PasswordChangeView
 from django.core.files.base import ContentFile
 from django.contrib import messages
-from . import forms, models
+from . import forms, models, mixins
 
 
-class LoginView(FormView):
+class LoginView(mixins.LoggedOutOnlyView, FormView):
 
     template_name = "users/login.html"
     form_class = forms.LoginForm
     # if use reverse -> error(config.urls 초기화보다 LoginView 초기화가 먼저 -> 없다고 나옴)
-    success_url = reverse_lazy("core:home")
+    # success_url = reverse_lazy("core:home")
 
     def form_valid(self, form):
         email = form.cleaned_data.get("email")
@@ -25,6 +26,19 @@ class LoginView(FormView):
             login(self.request, user)
         return super().form_valid(form)
 
+    def get_success_url(self):
+        """
+        Example : In log_out status, when he or she access
+        to update-password url directly,
+        At First go to login url and then go to update-password url  
+        """
+        next_arg = self.request.GET.get("next")
+        print(next_arg)
+        if next_arg is not None:
+            return next_arg
+        else:
+            return reverse("core:home")
+
 
 def log_out(request):
     messages.info(request, f"See you later")
@@ -33,7 +47,7 @@ def log_out(request):
     return redirect(reverse("core:home"))
 
 
-class SignUpView(FormView):
+class SignUpView(mixins.LoggedOutOnlyView, FormView):
 
     template_name = "users/signup.html"
     form_class = forms.SignUpForm
@@ -218,7 +232,7 @@ class UserProfileView(DetailView):
     model = models.User
     context_object_name = "user_obj"
     """
-    context_object_name 설정하지 않았을 시 이 View가 실행됐을 때 
+    context_object_name 설정하지 않았을 시 이 View가 실행됐을 때
     로그인 사용자의 정보를 view의 context 변수로 대체해버림
     (변수 이름이 user으로 동일)
 
@@ -233,7 +247,7 @@ class UserProfileView(DetailView):
     #     return context
 
 
-class UpdateProfileView(UpdateView):
+class UpdateProfileView(mixins.LoggedInOnlyView, SuccessMessageMixin, UpdateView):
 
     model = models.User
     template_name = "users/update-profile.html"
@@ -249,6 +263,7 @@ class UpdateProfileView(UpdateView):
         "language",
         "currency",
     )
+    success_message = "Profile Updated"
 
     def get_object(self, queryset=None):
         return self.request.user
@@ -271,9 +286,15 @@ class UpdateProfileView(UpdateView):
     #     return super().form_valid(form)
 
 
-class UpdatePasswordView(PasswordChangeView):
+class UpdatePasswordView(
+    mixins.LoggedInOnlyView,
+    mixins.EmailLoginOnlyView,
+    SuccessMessageMixin,
+    PasswordChangeView,
+):
 
     template_name = "users/update-password.html"
+    success_message = "Password Updated"
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class=form_class)
