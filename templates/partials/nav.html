@@ -1,6 +1,9 @@
 <ul class='flex items-center text-sm font-medium h-full'>
     {% if user.is_authenticated %}
-        <li class="nav-link"><a href="{% url "users:logout" %}">Log out</a></li>
+    <!-- line 4 also worked, but not showing (view on page) in admin page -->
+    <!-- <li class="nav-link"><a href="{% url "users:profile" user.pk %}">Profile</a></li> -->
+    <li class="nav-link"><a href="{{user.get_absolute_url}}">Profile</a></li>
+    <li class="nav-link"><a href="{% url "users:logout" %}">Log out</a></li>
     {% else %}
         <li class="nav-link"><a href="{% url "users:login" %}">Log in</a></li>
         <li class="nav-link"><a href="{% url "users:signup" %}">Sign up</a></li>

@@ -1,6 +1,6 @@
 import os
 import requests
-from django.views.generic import FormView
+from django.views.generic import FormView, DetailView, UpdateView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect, reverse
 from django.contrib.auth import authenticate, login, logout
@@ -210,3 +210,42 @@ def kakao_callback(request):
     except KakaoException as e:
         messages.error(request, e)
         return redirect(reverse("users:login"))
+
+
+class UserProfileView(DetailView):
+
+    model = models.User
+    context_object_name = "user_obj"
+    """
+    context_object_name 설정하지 않았을 시 이 View가 실행됐을 때 
+    로그인 사용자의 정보를 view의 context 변수로 대체해버림
+    (변수 이름이 user으로 동일)
+
+    """
+
+    # def get_context_data(self, **kwargs):
+    #     """
+    #     use when extending context
+    #     """
+    #     context = super().get_context_data(**kwargs)
+    #     context["hello"] = "Hello!"
+    #     return context
+
+
+class UpdateProfileView(UpdateView):
+
+    model = models.User
+    template_name = "users/update-profile.html"
+    fields = [
+        "first_name",
+        "last_name",
+        "avatar",
+        "gender",
+        "bio",
+        "birthdate",
+        "language",
+        "currency",
+    ]
+
+    def get_object(self, queryset=None):
+        return self.request.user
