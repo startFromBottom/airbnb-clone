@@ -1,5 +1,11 @@
 from django.http import Http404
-from django.views.generic import ListView, DetailView, View, UpdateView
+from django.views.generic import (
+    ListView,
+    DetailView,
+    View,
+    UpdateView,
+    FormView,
+)
 from django.shortcuts import render, redirect, reverse
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -178,3 +184,19 @@ class EditPhotoView(user_mixins.LoginRequiredMixin, SuccessMessageMixin, UpdateV
     def get_success_url(self):
         room_pk = self.kwargs.get("room_pk")
         return reverse("rooms:photos", kwargs={"pk": room_pk})
+
+
+class AddPhotoView(user_mixins.LoggedInOnlyView, FormView):
+
+    model = models.Photo
+    template_name = "rooms/photo_create.html"
+    fields = ("caption", "file")
+    form_class = forms.CreatePhotoForm
+    success_message = "Photo Uploaded"
+
+    def form_valid(self, form):
+        pk = self.kwargs.get("pk")  # send query arguments to forms.py
+        form.save(pk)
+        messages.success(self.request, "Photo Uploaded")
+        return redirect(reverse("rooms:photos", kwargs={"pk": pk}))
+
