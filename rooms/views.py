@@ -9,7 +9,6 @@ from django.views.generic import (
 from django.shortcuts import render, redirect, reverse
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django_countries import countries
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
@@ -146,6 +145,21 @@ class EditRoomView(user_mixins.LoggedInOnlyView, UpdateView):
         return room
 
 
+@login_required
+def delete_room(request, pk):
+    user = request.user
+    try:
+        room = models.Room.objects.get(pk=pk)
+        if room.host.pk != user.pk:
+            messages.error(request, "Can't delete that room")
+        else:
+            models.Room.objects.filter(pk=pk).delete()
+            messages.success(request, "Room Deleted")
+        return redirect(f"/users/{user.pk}")
+    except models.Room.DoesNotExist:
+        return redirect(reverse("core:home"))
+
+
 class RoomPhotosView(user_mixins.LoggedInOnlyView, DetailView):
 
     model = models.Room
@@ -199,4 +213,3 @@ class AddPhotoView(user_mixins.LoggedInOnlyView, FormView):
         form.save(pk)
         messages.success(self.request, "Photo Uploaded")
         return redirect(reverse("rooms:photos", kwargs={"pk": pk}))
-
