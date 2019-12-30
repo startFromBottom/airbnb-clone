@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, reverse
 from rooms import models as room_models
 from reviews import forms as review_forms
+from django.contrib.auth.decorators import login_required
 from . import models
 
 
