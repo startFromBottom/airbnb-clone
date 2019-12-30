@@ -1,6 +1,6 @@
 <ul class='flex items-center text-sm font-medium h-full'>
     {% if user.is_authenticated %}
-    <li class="nav-link"><a href="#"> See Reservations </a></li>
+    <li class="nav-link"><a href="{% url 'reservations:see' user.pk %}"> See Reservations </a></li>
     <li class="nav-link">
         <a href="{% url 'users:switch-hosting' %}">
             {% if request.session.is_hosting %}

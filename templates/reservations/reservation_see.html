@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+    {{user.first_name}}'s Profile
+{% endblock page_title %}
+
+{% block content %}
+
+<div class="">
+    <div class="container xl:w-1/3 lg:w-5/12 md:w-1/2 mx-auto my-10 flex flex-col items-center border p-6 border-gray-400">
+        <span class="font-bold text-3xl mx-auto">
+            {% if request.session.is_hosting %}
+                Guest's Reservation
+            {% else %}
+                My bookings
+            {% endif %}
+        </span>
+    </div>
+
+    {% for reservation in reservations %}
+    <div class="container w-2/5 flex flex-col items-start mx-auto mb-5 border p-5 border-gray-400">
+        <div class="text-2xl">
+            <span class="text-teal-600 text-2xl font-bold"> Room </span> : {{reservation.room}}
+        </div>
+        <div class="text-xl">
+            {% if request.session.is_hosting %}
+            <span class="text-teal-600 text-2xl font-bold"> Guest </span> : {{reservation.guest}}
+            {% else %}
+            <span class="text-teal-600 text-2xl font-bold"> Host </span> : {{reservation.room.host}}
+            {% endif %}
+        </div>
+        <div class="text-xl">
+            <span class="text-teal-600 text-2xl font-bold"> Check in </span> : {{reservation.check_in}}
+        </div>
+        <div class="text-xl">
+            <span class="text-teal-600 text-2xl font-bold"> Check out </span> : {{reservation.check_out}}
+        </div>
+        <div class="text-xl">
+            <span class="text-teal-600 text-2xl font-bold"> Status </span> : {{reservation.status}}
+        </div>
+        
+        {% if request.session.is_hosting %}
+            <div class="flex flex-row items-center w-full">
+
+                {% if reservation.status == "canceled" %}
+                    <a href="{% url 'reservations:edit-see' user.pk reservation.pk 'confirm' %}" class="btn-link w-1/3 mr-5"> Confirm </a>
+                {% elif reservation.status == 'pending' %}
+                    <a href="{% url 'reservations:edit-see' user.pk reservation.pk 'confirm' %}" class="btn-link w-1/3 mr-5"> Confirm </a>
+                    <a href="{% url 'reservations:edit-see' user.pk reservation.pk 'cancel' %}" class="btn-link w-1/3 mr-5"> Cancel </a>
+                    
+                {% else %}
+                    <a href="{% url 'reservations:edit-see' user.pk reservation.pk 'cancel' %}" class="btn-link w-1/3 mr-5"> Cancel </a>
+
+                {% endif %}
+            </div>
+        {% else %}
+            <div class="flex flex-row items-center w-full">
+                <a href="{% url 'reservations:detail' reservation.pk %}" class="btn-link w-1/3 mr-5">Show Details</a>
+                <a href="{% url 'reservations:edit-see' user.pk reservation.pk 'cancel' %}" class="btn-link w-1/3"> Cancel </a>
+            </div>
+        {% endif %}
+        
+
+    </div>
+    {% endfor %}
+</div>
+        
+{% endblock content %}
