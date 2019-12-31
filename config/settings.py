@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -170,3 +172,13 @@ LOGIN_URL = "/users/login/"
 # Locale
 
 LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"),)
+
+
+# Sentry
+
+if DEBUG is False:
+    sentry_sdk.init(
+        dsn=os.environ.get("SENTRY_URL"),
+        integrations=[DjangoIntegration()],
+        send_default_pii=True,
+    )
