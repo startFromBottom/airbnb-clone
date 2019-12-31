@@ -9,10 +9,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        try:
-            admin = User.objects.get(username="ebadmin")
-        except User.DoesNotExist:
-            admin = None
+        admin = User.objects.get_or_none(username="ebadmin")
 
         if admin is None:
             User.objects.create_superuser("ebadmin", "uhh0701@gmail.com", "sch0807!!")
